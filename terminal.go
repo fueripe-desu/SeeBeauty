@@ -19,11 +19,12 @@ func (t *Terminal) ApplyState(state *unix.Termios) {
 
 func (t *Terminal) Restore() {
 	t.ApplyState(&t.oldState)
+	t.DisableAlternateBuffer()
 }
 
 func (t *Terminal) EnableRawMode() {
 	// Disables echo and canonical mode
-	t.currentState.Lflag &^= unix.ECHO | unix.ICANON
+	t.currentState.Lflag &^= unix.ICANON | unix.ECHO | unix.ISIG
 
 	// Defines the minimum number of bytes before read returns
 	t.currentState.Cc[unix.VMIN] = 1
@@ -36,6 +37,18 @@ func (t *Terminal) EnableRawMode() {
 
 func (t *Terminal) GetFd() int {
 	return t.fileDescriptor
+}
+
+func (t *Terminal) EnableAlternateBuffer() {
+	os.Stdout.Write([]byte(escAlternateBuff))
+}
+
+func (t *Terminal) DisableAlternateBuffer() {
+	os.Stdout.Write([]byte(escExitAlternate))
+}
+
+func (t *Terminal) ClearAlternateBuffer() {
+	os.Stdout.Write([]byte(escClearScreen + escMoveCursorTop))
 }
 
 func NewTerminal() *Terminal {
