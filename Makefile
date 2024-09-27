@@ -1,5 +1,5 @@
 build:
-	@go build -o bin/bkalpha main.go 
+	@go build -o bin/bkalpha  
 
 run: build
 	@./bin/bkalpha
