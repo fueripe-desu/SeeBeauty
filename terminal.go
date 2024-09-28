@@ -13,6 +13,12 @@ type Terminal struct {
 	currentState   unix.Termios
 }
 
+func (t *Terminal) Init() {
+	t.EnableRawMode()
+	t.EnableAlternateBuffer()
+	t.ClearAlternateBuffer()
+}
+
 func (t *Terminal) ApplyState(state *unix.Termios) {
 	unix.IoctlSetTermios(t.fileDescriptor, unix.TCSETS, state)
 }

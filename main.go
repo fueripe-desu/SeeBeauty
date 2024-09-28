@@ -5,29 +5,31 @@ import (
 	"os"
 )
 
+type MainScreen struct {
+}
+
+func (s *MainScreen) OnEvent(ctx *Context, event Event) {
+	switch event.(type) {
+	case *OnWindowCreate:
+		fmt.Println("Window created!")
+	case *OnCreate:
+		fmt.Println("Screen created!")
+	}
+}
+
+func (s *MainScreen) Update(ctx *Context) {
+	var b = make([]byte, 1)
+	os.Stdin.Read(b)
+	fmt.Println("Something")
+	ctx.SendSignal(SigExit)
+}
+
 func main() {
 	term := NewTerminal()
-	term.EnableRawMode()
-	term.EnableAlternateBuffer()
-	term.ClearAlternateBuffer()
-	defer term.Restore()
+	term.Init()
 
-	fmt.Println("Raw mode enabled. Press 'q' to quit.")
+	renderer := NewRenderer(term)
+	mainScreen := &MainScreen{}
 
-	var b = make([]byte, 1)
-	for {
-		_, err := os.Stdin.Read(b)
-
-		if err != nil {
-			fmt.Println("Error reading input:", err)
-			break
-		}
-
-		if b[0] == 'q' {
-			break
-		}
-		fmt.Printf("You pressed: %q\n", b[0])
-	}
-
-	fmt.Println("Exiting, terminal restored.")
+	renderer.OpenScreen(mainScreen)
 }
