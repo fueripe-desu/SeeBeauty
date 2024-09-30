@@ -20,8 +20,11 @@ func (s *MainScreen) OnEvent(ctx *Context, event Event) {
 func (s *MainScreen) Update(ctx *Context) {
 	var b = make([]byte, 1)
 	os.Stdin.Read(b)
-	fmt.Println("Something")
 	ctx.SendSignal(SigExit)
+}
+
+func (s *MainScreen) View(ctx *Context) Component {
+	return NewText(0, 0, "Hello World!")
 }
 
 func main() {

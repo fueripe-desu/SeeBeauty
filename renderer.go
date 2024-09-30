@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -22,10 +23,14 @@ func (r *Renderer) OpenScreen(screen Screen) {
 
 	// Main loop
 	for {
+		if r.context.refresh {
+			fmt.Print(screen.View(r.context).Render())
+			r.context.refresh = false
+		}
+
 		for !(r.context.signals.IsEmpty()) {
 			r.handleSignal(r.context.signals.Dequeue())
 		}
-
 		screen.Update(r.context)
 	}
 }
