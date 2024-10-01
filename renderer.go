@@ -25,6 +25,7 @@ func (r *Renderer) OpenScreen(screen Screen) {
 	for {
 		if r.context.refresh {
 			fmt.Print(screen.View(r.context).Render())
+			fmt.Print(r.terminal.GetTerminalSize())
 			r.context.refresh = false
 		}
 

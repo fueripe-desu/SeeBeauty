@@ -19,6 +19,16 @@ func (t *Terminal) Init() {
 	t.ClearAlternateBuffer()
 }
 
+func (t *Terminal) GetTerminalSize() (int, int) {
+	ws, err := unix.IoctlGetWinsize(t.fileDescriptor, unix.TIOCGWINSZ)
+
+	if err != nil {
+		log.Fatalf("Could not access terminal size: %s", err.Error())
+	}
+
+	return int(ws.Col), int(ws.Row)
+}
+
 func (t *Terminal) ApplyState(state *unix.Termios) {
 	unix.IoctlSetTermios(t.fileDescriptor, unix.TCSETS, state)
 }
