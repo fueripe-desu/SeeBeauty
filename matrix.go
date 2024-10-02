@@ -126,6 +126,7 @@ func (m *Matrix) Place(x int, y int, element rune) {
 	newY := y - 1
 
 	m.data[newY][newX] = element
+	log.Println(m.data)
 }
 
 func (m *Matrix) ForEach(callback ElementCallback, rowCallback RowCallback) {
@@ -159,7 +160,7 @@ func (m *Matrix) ToBuffer() string {
 
 	m.ForEach(elementCallback, rowCallback)
 
-	return builder.String()
+	return builder.String()[:builder.Len()-1]
 }
 
 func NewMatrix(width int, height int) *Matrix {
