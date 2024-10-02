@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/rand"
 	"os"
 )
 
@@ -22,15 +21,7 @@ func (s *MainScreen) Update(ctx *Context) {
 }
 
 func (s *MainScreen) View(ctx *Context) Component {
-	matrix := NewMatrix(40, 20)
-
-	matrix.ForEach(func(element rune) rune {
-		return rune('0' + rand.Intn(10))
-	}, nil)
-
-	slice := matrix.Slice(0, 0, 22, 6)
-
-	return NewText(0, 0, slice.ToBuffer())
+	return NewText(0, 0, "Hello world!")
 }
 
 func main() {

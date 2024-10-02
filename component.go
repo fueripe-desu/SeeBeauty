@@ -1,7 +1,7 @@
 package main
 
 type Component interface {
-	Render() string
+	Render() *Matrix
 }
 
 type Text struct {
@@ -10,8 +10,15 @@ type Text struct {
 	Value string
 }
 
-func (t *Text) Render() string {
-	return t.Value
+func (t *Text) Render() *Matrix {
+	w := len(t.Value)
+	matrix := NewMatrix(w, 1)
+
+	for i, r := range t.Value {
+		matrix.Place(i+1, 1, r)
+	}
+
+	return matrix
 }
 
 func NewText(x int, y int, value string) *Text {

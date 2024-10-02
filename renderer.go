@@ -9,6 +9,13 @@ import (
 type Renderer struct {
 	terminal *Terminal
 	context  *Context
+	canva    *Matrix
+
+	// Viewport
+	offsetX int
+	offsetY int
+	width   int
+	height  int
 }
 
 func (r *Renderer) OpenScreen(screen Screen) {
@@ -24,8 +31,8 @@ func (r *Renderer) OpenScreen(screen Screen) {
 	// Main loop
 	for {
 		if r.context.refresh {
-			fmt.Print(screen.View(r.context).Render())
-			fmt.Print(r.terminal.GetTerminalSize())
+			r.canva.PlaceMatrix(1, 1, screen.View(r.context).Render())
+			fmt.Print(r.canva.ToBuffer())
 			r.context.refresh = false
 		}
 
@@ -51,10 +58,17 @@ func (r *Renderer) checkContext() {
 }
 
 func NewRenderer(term *Terminal) *Renderer {
-	ctx := NewContext()
+	w, h := term.GetTerminalSize()
+	ctx := NewContext(w, h)
+	canva := NewMatrix(w, h)
 
 	return &Renderer{
 		terminal: term,
 		context:  ctx,
+		canva:    canva,
+		offsetX:  0,
+		offsetY:  0,
+		width:    w,
+		height:   h,
 	}
 }
