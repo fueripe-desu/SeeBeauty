@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -11,9 +11,7 @@ type MainScreen struct {
 func (s *MainScreen) OnEvent(ctx *Context, event Event) {
 	switch event.(type) {
 	case *OnWindowCreate:
-		fmt.Println("Window created!")
 	case *OnCreate:
-		fmt.Println("Screen created!")
 	}
 }
 
@@ -24,7 +22,15 @@ func (s *MainScreen) Update(ctx *Context) {
 }
 
 func (s *MainScreen) View(ctx *Context) Component {
-	return NewText(0, 0, "Hello World!")
+	matrix := NewMatrix(40, 20)
+
+	matrix.ForEach(func(element rune) rune {
+		return rune('0' + rand.Intn(10))
+	}, nil)
+
+	slice := matrix.Slice(0, 0, 22, 6)
+
+	return NewText(0, 0, slice.ToBuffer())
 }
 
 func main() {
