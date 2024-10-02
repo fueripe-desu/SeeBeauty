@@ -31,7 +31,8 @@ func (r *Renderer) OpenScreen(screen Screen) {
 	// Main loop
 	for {
 		if r.context.refresh {
-			r.canva.PlaceMatrix(1, 1, screen.View(r.context).Render())
+			m, x, y := screen.View(r.context).Render()
+			r.canva.PlaceMatrix(x, y, m)
 			fmt.Print(r.canva.ToBuffer())
 			r.context.refresh = false
 		}
