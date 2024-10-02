@@ -15,8 +15,17 @@ type Terminal struct {
 
 func (t *Terminal) Init() {
 	t.EnableRawMode()
+	t.HideCursor()
 	t.EnableAlternateBuffer()
 	t.ClearAlternateBuffer()
+}
+
+func (t *Terminal) HideCursor() {
+	os.Stdout.Write([]byte(escHideCursor))
+}
+
+func (t *Terminal) ShowCursor() {
+	os.Stdout.Write([]byte(escShowCursor))
 }
 
 func (t *Terminal) GetTerminalSize() (int, int) {
@@ -36,6 +45,7 @@ func (t *Terminal) ApplyState(state *unix.Termios) {
 func (t *Terminal) Restore() {
 	t.ApplyState(&t.oldState)
 	t.DisableAlternateBuffer()
+	t.ShowCursor()
 }
 
 func (t *Terminal) EnableRawMode() {
