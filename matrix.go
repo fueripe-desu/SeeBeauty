@@ -5,9 +5,7 @@ import (
 	"strings"
 )
 
-type ElementCallback = func(element rune) rune
-type RowCallback = func(row []rune)
-type RevolutionCallback = func(index int, element rune) rune
+type ElementCallback = func(colIndex int, rowIndex int, element rune, end bool) rune
 
 type Matrix struct {
 	data   [][]rune
@@ -16,19 +14,19 @@ type Matrix struct {
 }
 
 func (m *Matrix) Disnulify() {
-	m.ForEach(func(element rune) rune {
+	m.ForEach(func(colIndex int, rowIndex int, element rune, end bool) rune {
 		if element == rune(0) {
 			return rune(' ')
 		}
 
 		return element
-	}, nil)
+	})
 }
 
 func (m *Matrix) Clear() {
-	m.ForEach(func(element rune) rune {
+	m.ForEach(func(colIndex int, rowIndex int, element rune, end bool) rune {
 		return rune(' ')
-	}, nil)
+	})
 }
 
 func (m *Matrix) GrowV(n int) {
@@ -140,15 +138,15 @@ func (m *Matrix) PlaceMatrix(x int, y int, matrix *Matrix) {
 	elementY := 0
 
 	matrix.ForEach(
-		func(element rune) rune {
+		func(colIndex int, rowIndex int, element rune, end bool) rune {
 			elementX++
 			m.Place(x+elementX, y+elementY, element)
-			return element
-		},
 
-		func(row []rune) {
-			elementX = -1
-			elementY++
+			if end {
+				elementX = -1
+				elementY++
+			}
+			return element
 		},
 	)
 }
@@ -178,7 +176,7 @@ func (m *Matrix) Place(x int, y int, element rune) {
 	m.data[newY][newX] = element
 }
 
-func (m *Matrix) ForEach(callback ElementCallback, rowCallback RowCallback) {
+func (m *Matrix) ForEach(callback ElementCallback) {
 	if callback == nil {
 		return
 	}
@@ -186,11 +184,12 @@ func (m *Matrix) ForEach(callback ElementCallback, rowCallback RowCallback) {
 	for outer := range m.data {
 		inner := m.data[outer]
 		for i := range inner {
-			inner[i] = callback(inner[i])
-		}
-
-		if rowCallback != nil {
-			rowCallback(inner)
+			inner[i] = callback(
+				outer,
+				i,
+				inner[i],
+				i == (len(inner)-1),
+			)
 		}
 	}
 }
@@ -198,16 +197,14 @@ func (m *Matrix) ForEach(callback ElementCallback, rowCallback RowCallback) {
 func (m *Matrix) ToBuffer() string {
 	var builder strings.Builder
 
-	elementCallback := func(element rune) rune {
+	m.ForEach(func(colIndex int, rowIndex int, element rune, end bool) rune {
 		builder.WriteRune(element)
+
+		if end {
+			builder.WriteString("\n")
+		}
 		return element
-	}
-
-	rowCallback := func(row []rune) {
-		builder.WriteString("\n")
-	}
-
-	m.ForEach(elementCallback, rowCallback)
+	})
 
 	return builder.String()[:builder.Len()-1]
 }

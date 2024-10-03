@@ -19,9 +19,9 @@ func (t *Text) Render() (*Matrix, int, int) {
 
 	w := len(t.Text)
 	matrix := t.generateMatrix(w, border)
-	matrix.ForEach(func(element rune) rune {
+	matrix.ForEach(func(colIndex int, rowIndex int, element rune, end bool) rune {
 		return rune('0')
-	}, nil)
+	})
 	t.placeBorder(matrix, border)
 
 	// for i, r := range t.Text {
