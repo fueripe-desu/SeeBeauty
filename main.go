@@ -22,9 +22,10 @@ func (s *MainScreen) Update(ctx *Context) {
 
 func (s *MainScreen) View(ctx *Context) Component {
 	return &Text{
-		Text: "Hello world!",
-		PosX: NewOption(40),
-		PosY: NewOption(10),
+		Text:   "Hello world!",
+		PosX:   NewInt(40),
+		PosY:   NewInt(10),
+		Border: NewBool(true),
 	}
 }
 

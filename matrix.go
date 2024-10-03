@@ -7,6 +7,7 @@ import (
 
 type ElementCallback = func(element rune) rune
 type RowCallback = func(row []rune)
+type RevolutionCallback = func(index int, element rune) rune
 
 type Matrix struct {
 	data   [][]rune
@@ -62,6 +63,55 @@ func (m *Matrix) GrowH(n int) {
 		}
 
 		m.data[outer] = row
+	}
+}
+
+func (m *Matrix) Border(
+	depth int,
+	t rune,
+	l rune,
+	b rune,
+	r rune,
+	tl rune,
+	tr rune,
+	bl rune,
+	br rune,
+) {
+	if depth < 1 {
+		log.Fatal("Depth of a revolution cannot be less than 1.")
+	}
+
+	top := depth
+	bottom := m.height - (depth - 1)
+	left := depth
+	right := m.width - (depth - 1)
+
+	for y := 1; y <= m.height; y++ {
+		for x := 1; x <= m.width; x++ {
+			if y == top {
+				if x == left {
+					m.Place(x, y, tl)
+				} else if x == right {
+					m.Place(x, y, tr)
+				} else {
+					m.Place(x, y, t)
+				}
+			} else if y == bottom {
+				if x == left {
+					m.Place(x, y, bl)
+				} else if x == right {
+					m.Place(x, y, br)
+				} else {
+					m.Place(x, y, b)
+				}
+			} else {
+				if x == left {
+					m.Place(x, y, l)
+				} else if x == right {
+					m.Place(x, y, r)
+				}
+			}
+		}
 	}
 }
 
@@ -126,7 +176,6 @@ func (m *Matrix) Place(x int, y int, element rune) {
 	newY := y - 1
 
 	m.data[newY][newX] = element
-	log.Println(m.data)
 }
 
 func (m *Matrix) ForEach(callback ElementCallback, rowCallback RowCallback) {

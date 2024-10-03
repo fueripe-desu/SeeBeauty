@@ -4,52 +4,77 @@ type Component interface {
 	Render() (*Matrix, int, int)
 }
 
-type Option[T int] struct {
-	Value    *T
-	HasValue bool
-}
-
-func NewOption[T int](value T) Option[T] {
-	return Option[T]{Value: &value, HasValue: true}
-}
-
-func NewNone[T int]() Option[T] {
-	return Option[T]{Value: nil, HasValue: false}
-}
-
 type Text struct {
 	Text string
 
-	PosX Option[int]
-	PosY Option[int]
+	PosX   *Integer
+	PosY   *Integer
+	Border *Bool
 }
 
 func (t *Text) Render() (*Matrix, int, int) {
-	w := len(t.Text)
-	matrix := NewMatrix(w, 1)
-
-	for i, r := range t.Text {
-		matrix.Place(i+1, 1, r)
-	}
-
+	// Params Evaluation
 	x, y := t.evalPosition()
+	border := t.evalBorder()
+
+	w := len(t.Text)
+	matrix := t.generateMatrix(w, border)
+	matrix.ForEach(func(element rune) rune {
+		return rune('0')
+	}, nil)
+	t.placeBorder(matrix, border)
+
+	// for i, r := range t.Text {
+	// matrix.Place(i+1, 1, r)
+	// }
+
 	return matrix, x, y
 }
 
-func (t *Text) evalPosition() (int, int) {
-	var x int
-	var y int
-
-	if t.PosX.HasValue {
-		x = *(t.PosX.Value)
-	} else {
-		x = 1
+func (t *Text) evalBorder() bool {
+	if t.Border != nil {
+		return t.Border.val
 	}
 
-	if t.PosY.HasValue {
-		y = *(t.PosY.Value)
+	return false
+}
+
+func (t *Text) placeBorder(matrix *Matrix, border bool) {
+	if !border {
+		return
+	}
+
+	matrix.Border(
+		1,
+		rune('─'),
+		rune('│'),
+		rune('─'),
+		rune('│'),
+		rune('┌'),
+		rune('┐'),
+		rune('└'),
+		rune('┘'),
+	)
+}
+
+func (t *Text) generateMatrix(width int, border bool) *Matrix {
+	if border {
+		return NewMatrix(width+4, 1+4)
 	} else {
-		y = 1
+		return NewMatrix(width, 1)
+	}
+}
+
+func (t *Text) evalPosition() (int, int) {
+	x := 1
+	y := 1
+
+	if t.PosX != nil {
+		x = t.PosX.val
+	}
+
+	if t.PosY != nil {
+		y = t.PosY.val
 	}
 
 	return x, y
