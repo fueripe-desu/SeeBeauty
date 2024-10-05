@@ -29,6 +29,48 @@ func (m *Matrix) Clear() {
 	})
 }
 
+func (m *Matrix) Height() int {
+	return m.height
+}
+
+func (m *Matrix) Width() int {
+	return m.width
+}
+
+func (m *Matrix) Get(col int, row int) rune {
+	if col > m.height || col < 1 {
+		log.Fatal("Column out of bounds.")
+	}
+
+	if row > m.width || row < 1 {
+		log.Fatal("Row out of bounds.")
+	}
+	return m.data[col-1][row-1]
+}
+
+func (m *Matrix) GetRow(row int) []rune {
+	if row < 1 || row > m.height {
+		log.Fatal("Row out of bounds.")
+	}
+	return m.data[row-1]
+
+}
+
+func (m *Matrix) GetCol(col int) []rune {
+	if col < 1 || col > m.width {
+		log.Fatal("Column out of bounds.")
+	}
+
+	result := []rune{}
+
+	for i := range m.data {
+		row := m.data[i]
+		result = append(result, row[col-1])
+	}
+
+	return result
+}
+
 func (m *Matrix) GrowV(n int) {
 	if n <= 0 {
 		return
@@ -149,6 +191,34 @@ func (m *Matrix) PlaceMatrix(x int, y int, matrix *Matrix) {
 			return element
 		},
 	)
+}
+
+func (m *Matrix) PlaceRow(x int, y int, row []rune) {
+	if row == nil {
+		log.Fatal("Cannot place a row if nil.")
+	}
+
+	if len(row) != m.width {
+		log.Fatal("Row have a different width than the matrix.")
+	}
+
+	for i, r := range row {
+		m.Place(x+i, y, r)
+	}
+}
+
+func (m *Matrix) PlaceCol(x int, y int, col []rune) {
+	if col == nil {
+		log.Fatal("Cannot place a column if nil.")
+	}
+
+	if len(col) != m.height {
+		log.Fatal("Column have a different height than the matrix.")
+	}
+
+	for i, r := range col {
+		m.Place(x, y+i, r)
+	}
 }
 
 func (m *Matrix) Place(x int, y int, element rune) {
