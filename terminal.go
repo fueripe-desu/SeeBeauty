@@ -3,21 +3,56 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"golang.org/x/sys/unix"
+)
+
+type TerminalColor int
+
+const (
+	TrueColor TerminalColor = iota
+	Color256
+	AnsiColor
 )
 
 type Terminal struct {
 	fileDescriptor int
 	oldState       unix.Termios
 	currentState   unix.Termios
+	colorSupport   TerminalColor
 }
 
 func (t *Terminal) Init() {
+	t.colorSupport = t.GetBestColorSupport()
 	t.EnableRawMode()
 	t.HideCursor()
 	t.EnableAlternateBuffer()
 	t.ClearAlternateBuffer()
+}
+
+func (t *Terminal) GetColorSupport() TerminalColor {
+	return t.colorSupport
+}
+
+func (t *Terminal) GetBestColorSupport() TerminalColor {
+	if t.SupportsTrueColor() {
+		return TrueColor
+	} else if t.Supports256Color() {
+		return Color256
+	} else {
+		return AnsiColor
+	}
+}
+
+func (t *Terminal) SupportsTrueColor() bool {
+	colorTerm := os.Getenv("COLORTERM")
+	return colorTerm == "truecolor" || colorTerm == "24bit"
+}
+
+func (t *Terminal) Supports256Color() bool {
+	envVar := os.Getenv("TERM")
+	return strings.Contains(envVar, "256color")
 }
 
 func (t *Terminal) HideCursor() {
@@ -89,5 +124,6 @@ func NewTerminal() *Terminal {
 		fileDescriptor: fd,
 		oldState:       *termios,
 		currentState:   *termios,
+		colorSupport:   AnsiColor,
 	}
 }
