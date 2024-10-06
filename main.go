@@ -22,17 +22,14 @@ func (s *MainScreen) Update(ctx *Context) {
 
 func (s *MainScreen) View(ctx *Context) Component {
 	return &Text{
-		Text:          "Hello world!",
-		PosX:          NewInt(40),
-		PosY:          NewInt(10),
-		Border:        NewBool(true),
-		PaddingTop:    NewInt(2),
-		PaddingBottom: NewInt(2),
-		PaddingLeft:   NewInt(2),
-		PaddingRight:  NewInt(2),
-		Width:         NewInt(18),
-		Height:        NewInt(15),
-		EllipsisWrap:  NewBool(false),
+		Text:       "Hello world!",
+		Position:   NewXY(40, 10),
+		Dimensions: NewWH(18, 15),
+		Padding:    NewPadding(2),
+		Border: NewBorder(
+			NewBorderSide(BorderRounded),
+		),
+		Props: NewTextProps(0, false, false),
 	}
 }
 
